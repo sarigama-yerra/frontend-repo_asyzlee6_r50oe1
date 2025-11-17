@@ -14,17 +14,34 @@ export default function Layout() {
   const [theme, setTheme] = useState('system');
   const [open, setOpen] = useState(false);
 
+  // Load saved theme
   useEffect(() => {
     const saved = localStorage.getItem('theme') || 'system';
     setTheme(saved);
   }, []);
 
+  // Apply theme and persist
   useEffect(() => {
     const root = document.documentElement;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const prefersDark = mq.matches;
     const enableDark = theme === 'dark' || (theme === 'system' && prefersDark);
     root.classList.toggle('dark', enableDark);
     localStorage.setItem('theme', theme);
+
+    // Update on system theme changes when in system mode
+    function handleChange(e) {
+      if (theme === 'system') {
+        root.classList.toggle('dark', e.matches);
+      }
+    }
+    mq.addEventListener?.('change', handleChange);
+    // Safari fallback
+    mq.addListener?.(handleChange);
+    return () => {
+      mq.removeEventListener?.('change', handleChange);
+      mq.removeListener?.(handleChange);
+    };
   }, [theme]);
 
   return (
