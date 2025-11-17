@@ -2,6 +2,25 @@ import { motion } from 'framer-motion';
 import Spline from '@splinetool/react-spline';
 
 export default function Hero() {
+  const heading = 'Crafting fast, accessible websites with motion that converts';
+
+  const container = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.035, delayChildren: 0.1 }
+    }
+  };
+
+  const child = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] }
+    }
+  };
+
   return (
     <section className="relative pt-16 md:pt-24 pb-14 md:pb-20">
       {/* Background accents */}
@@ -21,9 +40,23 @@ export default function Hero() {
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             Open for new projects Q1–Q2
           </div>
-          <h1 className="mt-4 text-[clamp(28px,6vw,54px)] font-bold leading-tight tracking-tight">
-            Crafting fast, accessible websites with motion that converts
-          </h1>
+
+          <motion.h1
+            className="mt-4 text-[clamp(28px,6vw,54px)] font-bold leading-tight tracking-tight"
+            variants={container}
+            initial="hidden"
+            animate="visible"
+            aria-label={heading}
+          >
+            {heading.split(' ').map((word, i) => (
+              <span key={i} className="inline-block overflow-hidden align-top">
+                <motion.span variants={child} className="inline-block mr-2">
+                  {word}
+                </motion.span>
+              </span>
+            ))}
+          </motion.h1>
+
           <p className="mt-3 text-[15px] md:text-base text-slate-700 dark:text-slate-300 max-w-xl">
             I blend design and frontend engineering to ship sleek, responsive experiences for startups and agencies worldwide.
           </p>
