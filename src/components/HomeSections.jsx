@@ -1,12 +1,15 @@
 import { motion } from 'framer-motion';
 import { blogs, clients, projects, testimonials } from '../data';
-import { ArrowLeft, ArrowRight, Star, Code2, ShoppingCart, Layout as LayoutIcon, Globe } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Star, Quote, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export function SectionTitle({ title, action }) {
+export function SectionTitle({ title, action, subtitle }) {
   return (
-    <div className="flex items-end justify-between mb-8">
-      <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">{title}</h2>
+    <div className="mb-8 flex items-end justify-between">
+      <div>
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">{title}</h2>
+        {subtitle && <p className="mt-1 text-sm text-slate-600 dark:text-slate-400 max-w-2xl">{subtitle}</p>}
+      </div>
       {action}
     </div>
   );
@@ -60,38 +63,48 @@ export function TestimonialsCarousel() {
     <section className="py-16 md:py-24">
       <SectionTitle
         title="What clients say"
+        subtitle="Real feedback from recent collaborations — focused on communication, quality, and measurable results."
         action={
-          <div className="flex gap-2">
-            <button onClick={() => document.getElementById('t-scroll').scrollBy({left:-420, behavior:'smooth'})} className="p-2 rounded-full border border-slate-200/70 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur hover:bg-white dark:hover:bg-slate-800"><ArrowLeft size={18}/></button>
-            <button onClick={() => document.getElementById('t-scroll').scrollBy({left:420, behavior:'smooth'})} className="p-2 rounded-full border border-slate-200/70 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur hover:bg-white dark:hover:bg-slate-800"><ArrowRight size={18}/></button>
+          <div className="hidden sm:flex gap-2">
+            <button aria-label="Previous" onClick={() => document.getElementById('t-scroll').scrollBy({left:-420, behavior:'smooth'})} className="p-2 rounded-full border border-slate-200/70 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur hover:bg-white dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"><ArrowLeft size={18}/></button>
+            <button aria-label="Next" onClick={() => document.getElementById('t-scroll').scrollBy({left:420, behavior:'smooth'})} className="p-2 rounded-full border border-slate-200/70 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur hover:bg-white dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"><ArrowRight size={18}/></button>
           </div>
         }
       />
-      <div id="t-scroll" className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth py-2">
+
+      <div id="t-scroll" className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth py-2 scrollbar-hide" role="region" aria-label="Testimonials" tabIndex={0}>
         {testimonials.map((t, i) => (
-          <motion.div
+          <motion.figure
             key={i}
             initial={{opacity:0, y: 10}} whileInView={{opacity:1, y:0}} viewport={{ once: true }}
-            className="min-w-[360px] md:min-w-[420px] snap-center relative"
+            className="min-w-[85%] xs:min-w-[360px] sm:min-w-[420px] lg:min-w-[520px] snap-center relative"
           >
-            <div className="relative p-6 rounded-2xl border border-slate-200/70 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60 backdrop-blur shadow-sm h-full">
-              <div className="absolute -top-3 -left-3 text-blue-600/20 dark:text-blue-400/20">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path d="M7.17 6A5.17 5.17 0 0 0 2 11.17V22h8v-8H6.5A3.5 3.5 0 0 1 10 10.5V2H2.83A.83.83 0 0 0 2 2.83V6h5.17ZM20.17 6A5.17 5.17 0 0 0 15 11.17V22h8v-8h-3.5A3.5 3.5 0 0 1 23 10.5V2h-7.17a.83.83 0 0 0-.83.83V6h5.17Z"/></svg>
+            <blockquote className="relative p-6 md:p-7 rounded-2xl border border-slate-200/70 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60 backdrop-blur shadow-sm h-full">
+              <div className="absolute -top-4 -left-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                <Quote size={18} />
               </div>
-              <div className="flex items-center gap-3">
-                <img src={t.avatar} alt={t.name} className="h-12 w-12 rounded-full object-cover ring-2 ring-blue-600/20" />
-                <div>
-                  <div className="font-medium">{t.name}</div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">{t.role}</div>
+              <p className="text-slate-700 dark:text-slate-200 text-[15px] leading-relaxed">“{t.quote}”</p>
+              <figcaption className="mt-5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img src={t.avatar} alt="" className="h-10 w-10 rounded-full object-cover ring-2 ring-blue-600/15" />
+                  <div>
+                    <div className="font-medium">{t.name}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{t.role}</div>
+                  </div>
                 </div>
-              </div>
-              <p className="mt-4 text-slate-700 dark:text-slate-200 text-[15px] leading-relaxed">“{t.quote}”</p>
-              <div className="mt-4 flex items-center gap-1 text-amber-500">
-                {Array.from({length:5}).map((_,i)=>(<Star key={i} size={16} fill="currentColor" className="" />))}
-              </div>
-            </div>
-          </motion.div>
+                <div className="flex items-center gap-1 text-amber-500" aria-label="5 out of 5 stars">
+                  {Array.from({length:5}).map((_,i)=>(<Star key={i} size={16} fill="currentColor" className="" />))}
+                </div>
+              </figcaption>
+            </blockquote>
+          </motion.figure>
         ))}
+      </div>
+
+      {/* Mobile controls */}
+      <div className="mt-4 flex sm:hidden justify-center gap-2">
+        <button aria-label="Previous" onClick={() => document.getElementById('t-scroll').scrollBy({left:-320, behavior:'smooth'})} className="p-2 rounded-full border border-slate-200/70 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur hover:bg-white dark:hover:bg-slate-800"><ArrowLeft size={18}/></button>
+        <button aria-label="Next" onClick={() => document.getElementById('t-scroll').scrollBy({left:320, behavior:'smooth'})} className="p-2 rounded-full border border-slate-200/70 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur hover:bg-white dark:hover:bg-slate-800"><ArrowRight size={18}/></button>
       </div>
     </section>
   );
@@ -99,18 +112,18 @@ export function TestimonialsCarousel() {
 
 export function Expertise() {
   const items = [
-    { icon: <LayoutIcon className="h-6 w-6" />, title: 'Elementor', desc: 'Pixel-perfect pages with performance & responsive polish.' },
-    { icon: <Globe className="h-6 w-6" />, title: 'WordPress', desc: 'Flexible CMS setups with clean, secure best practices.' },
-    { icon: <ShoppingCart className="h-6 w-6" />, title: 'WooCommerce', desc: 'Conversion-focused storefronts with micro-interactions.' },
-    { icon: <Code2 className="h-6 w-6" />, title: 'Custom Development', desc: 'Tailored components, animations, and integrations.' },
+    { icon: <Sparkles className="h-6 w-6" />, title: 'Micro‑interactions', desc: 'Delightful animations that enhance usability and conversions.' },
+    { icon: <Sparkles className="h-6 w-6" />, title: 'Responsive UX', desc: 'Every breakpoint tuned for clarity, tap targets, and speed.' },
+    { icon: <Sparkles className="h-6 w-6" />, title: 'Performance', desc: 'Images, fonts, and JS optimized for fast LCP and TTI.' },
+    { icon: <Sparkles className="h-6 w-6" />, title: 'Accessibility', desc: 'Keyboard, contrast, semantics — inclusive by default.' },
   ];
   return (
     <section className="py-16 md:py-24">
-      <SectionTitle title="Expertise" />
-      <div className="grid md:grid-cols-4 gap-6">
+      <SectionTitle title="Expertise" subtitle="A balanced blend of design craft and engineering discipline." />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {items.map((it, i) => (
           <motion.div key={i} initial={{opacity:0, y: 10}} whileInView={{opacity:1, y:0}} viewport={{ once: true }} className="group bg-white/70 dark:bg-slate-800/60 backdrop-blur rounded-2xl p-6 border border-slate-200/70 dark:border-slate-700 shadow-sm hover:shadow-lg transition">
-            <div className="h-10 w-10 rounded-xl grid place-items-center bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 mb-3 group-hover:scale-105 transition">{it.icon}</div>
+            <div className="h-10 w-10 rounded-xl grid place-items-center bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 mb-3 group-hover:scale-105 transition"><Sparkles className="h-5 w-5" /></div>
             <div className="text-base font-semibold">{it.title}</div>
             <p className="text-slate-600 dark:text-slate-300 mt-1 text-sm">{it.desc}</p>
           </motion.div>
@@ -124,7 +137,7 @@ export function HomePortfolio() {
   return (
     <section className="py-16 md:py-24">
       <SectionTitle title="Selected work" action={<Link className="text-blue-600 hover:underline" to="/portfolio">View all</Link>} />
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.slice(0,3).map((p, i)=> (
           <motion.article key={p.id} initial={{opacity:0, y: 10}} whileInView={{opacity:1, y:0}} viewport={{ once: true }} transition={{delay: i*0.05}} className="bg-white/70 dark:bg-slate-800/60 backdrop-blur rounded-xl border border-slate-200/70 dark:border-slate-700 overflow-hidden hover:shadow-lg transition">
             <Link to={`/portfolio/${p.id}`}>
@@ -147,7 +160,7 @@ export function HomePortfolio() {
 export function CTA() {
   return (
     <section id="contact" className="py-16 md:py-24">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-8 md:p-12 flex items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-8 md:p-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div>
           <h3 className="text-2xl md:text-3xl font-semibold">Have a project in mind?</h3>
           <p className="opacity-90 mt-1">Let’s craft a fast, animated website that converts.</p>
