@@ -1,24 +1,70 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import Spline from '@splinetool/react-spline';
 
 export default function Hero() {
-  const heading = 'Crafting fast, accessible websites with motion that converts';
+  const phrase = 'Crafting fast, accessible websites with motion that converts';
 
-  const container = {
-    hidden: { opacity: 1 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.035, delayChildren: 0.1 }
-    }
-  };
+  // Typing effect state
+  const [displayed, setDisplayed] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loop, setLoop] = useState(0);
+  const mounted = useRef(true);
 
-  const child = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] }
+  // Tunable timings
+  const speeds = useMemo(
+    () => ({ type: 42, delete: 26, pauseAtEnd: 1600, pauseBeforeStart: 400 }),
+    []
+  );
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let timer;
+
+    const full = phrase;
+    const atEnd = displayed === full;
+    const atStart = displayed.length === 0;
+
+    if (!isDeleting && !atEnd) {
+      // typing forward
+      timer = setTimeout(() => {
+        if (!mounted.current) return;
+        setDisplayed(full.slice(0, displayed.length + 1));
+      }, speeds.type);
+    } else if (!isDeleting && atEnd) {
+      // pause at end then start deleting
+      timer = setTimeout(() => {
+        if (!mounted.current) return;
+        setIsDeleting(true);
+      }, speeds.pauseAtEnd);
+    } else if (isDeleting && !atStart) {
+      // deleting backwards
+      timer = setTimeout(() => {
+        if (!mounted.current) return;
+        setDisplayed(full.slice(0, displayed.length - 1));
+      }, speeds.delete);
+    } else if (isDeleting && atStart) {
+      // pause then start typing again (infinite loop)
+      timer = setTimeout(() => {
+        if (!mounted.current) return;
+        setIsDeleting(false);
+        setLoop((n) => n + 1);
+      }, speeds.pauseBeforeStart);
     }
+
+    return () => clearTimeout(timer);
+  }, [displayed, isDeleting, phrase, speeds]);
+
+  // Subtle entrance animation for the content block
+  const containerFade = {
+    initial: { opacity: 0, y: 18 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
   };
 
   return (
@@ -31,31 +77,23 @@ export default function Hero() {
 
       <div className="mx-auto max-w-7xl grid items-center md:grid-cols-2 gap-8 lg:gap-12 px-4">
         {/* Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >
+        <motion.div variants={containerFade} initial="initial" animate="animate">
           <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 backdrop-blur px-2.5 py-1.5 text-xs text-slate-600 dark:text-slate-300">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             Open for new projects Q1–Q2
           </div>
 
-          <motion.h1
+          <h1
             className="mt-4 text-[clamp(28px,6vw,54px)] font-bold leading-tight tracking-tight"
-            variants={container}
-            initial="hidden"
-            animate="visible"
-            aria-label={heading}
+            aria-label={phrase}
           >
-            {heading.split(' ').map((word, i) => (
-              <span key={i} className="inline-block overflow-hidden align-top">
-                <motion.span variants={child} className="inline-block mr-2">
-                  {word}
-                </motion.span>
-              </span>
-            ))}
-          </motion.h1>
+            <span className="sr-only">{phrase}</span>
+            <span aria-hidden>{displayed}</span>
+            <span
+              aria-hidden
+              className="ml-1 inline-block align-[-0.1em] h-[1.05em] w-[2px] bg-slate-900 dark:bg-slate-100 animate-pulse"
+            />
+          </h1>
 
           <p className="mt-3 text-[15px] md:text-base text-slate-700 dark:text-slate-300 max-w-xl">
             I blend design and frontend engineering to ship sleek, responsive experiences for startups and agencies worldwide.
